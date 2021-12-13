@@ -1,0 +1,96 @@
+---
+title: "Perception Action Analysis"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+
+knitr::opts_chunk$set(echo = TRUE)
+setwd("~/OneDrive - Aarhus Universitet/UNI/P&A/Exam/PERC-ACT_EXAM")
+
+pacman::p_load(tidyverse,dplyr, data.table, vroom, ggplot2, readbulk, lme4, rstanarm, MuMIn, lmerTest, lme4,multcomp, interactions, sjPlot, sjmisc)
+
+
+```
+
+Read data
+```{r}
+df <- read_bulk(directory = "/Users/emmaolsen/OneDrive - Aarhus Universitet/UNI/P&A/Exam/PERC-ACT_EXAM/logfiles_emma/",
+    fun = read_csv)
+
+df <- read_csv("/Users/emmaolsen/OneDrive - Aarhus Universitet/UNI/P&A/Exam/PERC-ACT_EXAM/logfiles_emma/logfile_test_2021_Dec_13_0937_1.csv")
+```
+
+Remove the weird [' '] part of the Colourtask (key press), leaving only the letter
+```{r}
+
+df$Colourtask = gsub("'", "", df$Colourtask)
+df$Colourtask = gsub("\\[|\\]", "", df$Colourtask)
+unique(df$Colourtask)
+```
+
+Making stimulus variable neat (only leaving y1a format)
+```{r}
+df$Stimulus = gsub("/Users/emmaolsen/OneDrive - Aarhus Universitet/UNI/P&A/Exam/PERC-ACT_EXAM/stimuli/", "", df$Stimulus)
+df$Stimulus = gsub(".png", "", df$Stimulus)
+```
+
+Make a simple stim variable
+```{r}
+
+# df$Stimulus = gsub("a", "", df$Stimulus)
+df$Stimulus = gsub("b", "", df$Stimulus)
+df$Stimulus = gsub("1234567890", "", df$Stimulus)
+
+length(unique(df$Stimulus))
+which(df$Stimulus %in% "y")
+
+```
+
+Do a subset test
+```{r}
+
+test <- df %>%
+    filter(ID == "sjovtparticipantid")
+
+```
+
+
+Create correct variable. If variable 'Stimulus' contains character value y, the variable "correct" should be 
+```{r}
+
+df$correct = ifelse((df$Stimulus %in% "y" & df$Colourtask == "y") | (df$Stimulus %in% "r" & df$Colourtask == "r"),1,0)
+
+```
+
+Create crossmodal correspondence variable?
+```{r}
+# 1 is yellow
+# 2 is red
+# 0 is control
+
+df$crossmodal = ifelse((df$Stimulus %in% "y" & df$Condition == 1) | (df$Stimulus %in% "r" & df$Condition == 2), 1,0)
+
+```
+
+```{r}
+hist(df$ReactionTime)
+
+```
+
+```{r}
+hist(df$Stimulus)
+```
+
+## Analysis 
+https://www.crumplab.com/statisticsLab/lab-9-repeated-measures-anova.html
+
+Independent variable: Stimulus, Condition
+Dependent: RT, correct
+
+Find mean RT for each condition
+```{r}
+
+```
+
+
